@@ -1,6 +1,6 @@
 use ocpp::call::Payload;
-use ocpp::Message;
 use ocpp::v16::authorize::Authorize;
+use ocpp::Message;
 
 #[derive(Debug, Clone)]
 pub struct TPBE;
@@ -17,8 +17,7 @@ pub enum Source {
 }
 
 impl FromRequest for Source {
-    fn from_request(req: &Request) -> Self
-    {
+    fn from_request(req: &Request) -> Self {
         req.1.clone()
     }
 }
