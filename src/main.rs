@@ -5,14 +5,12 @@ mod response;
 mod router;
 
 use handler::IntoHandler;
-use ocpp::call_result::{CallResult, Payload};
 use ocpp::v16::authorize::Authorize;
 use ocpp::v16::authorize_response::{AuthorizeResponse, IdTagInfo, Status};
 use request::{Call, Request, Source, CGW, TPBE};
-use response::IntoResponse;
 
+use logger::Logger;
 use router::Router;
-//use logger::Logger;
 
 fn call_authorize_cgw(Call(Authorize { id_tag }, ..): Call<Authorize, CGW>) -> AuthorizeResponse {
     println!("CGW: Authorize id_tag: {}", id_tag);
@@ -25,16 +23,23 @@ fn call_authorize_cgw(Call(Authorize { id_tag }, ..): Call<Authorize, CGW>) -> A
     }
 }
 
-fn call_authorize_tpb(Call(authorize, ..): Call<Authorize, TPBE>) {
+fn call_authorize_tpb(Call(authorize, ..): Call<Authorize, TPBE>) -> AuthorizeResponse {
     println!("TPBE: {:?}", authorize);
+    AuthorizeResponse {
+        id_tag_info: IdTagInfo {
+            status: Status::Accepted,
+            parent_id_tag: None,
+            expiry_date: None,
+        },
+    }
 }
 
 fn main() {
     tracing_subscriber::fmt::init();
     let router = Router::new()
-        //.route(Logger(call_authorize_cgw.into_handler()))
-        //.route(Logger(call_authorize_tpb.into_handler()));
-        .route(call_authorize_cgw.into_handler());
+        .route(Logger(call_authorize_cgw.into_handler()))
+        .route(Logger(call_authorize_tpb.into_handler()));
+    //.route(call_authorize_cgw.into_handler())
     //.route(call_authorize_tpb.into_handler());
 
     let ocpp_message =
