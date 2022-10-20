@@ -2,43 +2,59 @@ use std::{any::TypeId, marker::PhantomData};
 
 use crate::request::{FromRequest, Request};
 
-pub struct ConcreteHandler<F, Args> {
+pub struct ConcreteHandler<F, Args, O> {
     func: F,
     args: PhantomData<Args>,
+    o: PhantomData<O>,
 }
 
-pub trait IntoHandler<F, Args> {
-    fn into_handler(self: Self) -> ConcreteHandler<F, Args>;
+pub trait IntoHandler<F, Args, O> {
+    fn into_handler(self: Self) -> ConcreteHandler<F, Args, O>;
 }
 
-pub trait Handler {
-    fn call(&self, args: &Request); // -> Self::Output;
+pub trait Handler<O: IntoResponse> {
+    fn call(&self, args: &Request) -> O;
     fn routing_key(&self) -> TypeId;
 }
 
-impl<Func, A: FromRequest + 'static> Handler for ConcreteHandler<Func, (A,)>
+pub trait IntoResponse {
+    fn into_response(&self) -> String;
+}
+
+impl IntoResponse for () {
+    fn into_response(&self) -> String {
+        "()".to_string()
+    }
+}
+
+impl<Func, A: FromRequest + 'static, O> Handler<O> for ConcreteHandler<Func, (A,), O>
 where
-    Func: Fn(A),
+    O: IntoResponse,
+    Func: Fn(A) -> O,
 {
     #[allow(unused_variables)]
-    fn call(&self, request: &Request) {
-        (self.func)(A::from_request(request));
+    fn call(&self, request: &Request) -> O {
+        (self.func)(A::from_request(request))
     }
+
     fn routing_key(&self) -> TypeId {
         TypeId::of::<(A,)>()
     }
 }
-impl<Func, A> IntoHandler<Func, (A,)> for Func
+
+impl<Func, A, O> IntoHandler<Func, (A,), O> for Func
 where
+    O: IntoResponse,
     A: FromRequest,
-    Func: Fn(A),
+    Func: Fn(A) -> O,
 {
     #[inline]
     #[allow(non_snake_case)]
-    fn into_handler(self: Func) -> ConcreteHandler<Func, (A,)> {
+    fn into_handler(self: Func) -> ConcreteHandler<Func, (A,), O> {
         ConcreteHandler {
             func: self,
             args: PhantomData,
+            o: PhantomData,
         }
     }
 }

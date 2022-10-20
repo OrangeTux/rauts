@@ -3,12 +3,18 @@ mod logger;
 mod request;
 mod router;
 
-use handler::IntoHandler;
+use handler::{IntoHandler, IntoResponse};
 use ocpp::v16::authorize::Authorize;
 use request::{Call, Request, Source, CGW, TPBE};
 
 use router::Router;
 //use logger::Logger;
+
+impl IntoResponse for u8 {
+    fn into_response(&self) -> String {
+        format!("{}", self)
+    }
+}
 
 fn call_authorize_cgw(Call(Authorize { id_tag }, ..): Call<Authorize, CGW>) {
     println!("CGW: Authorize id_tag: {}", id_tag);

@@ -1,26 +1,30 @@
 use std::any::TypeId;
 use std::collections::HashMap;
 
-use crate::handler::Handler;
+use crate::handler::{Handler, IntoResponse};
 use crate::request::*;
 use ocpp::call::Payload;
 use ocpp::v16::authorize::Authorize;
 use ocpp::Message;
 
-pub struct Router {
-    routes: HashMap<TypeId, Box<dyn Handler>>,
+pub struct Router<O: IntoResponse> {
+    routes: HashMap<TypeId, Box<dyn Handler<O>>>,
 }
 
-impl Router {
+impl<O> Router<O>
+where
+    O: IntoResponse,
+{
     pub fn new() -> Self {
         Self {
             routes: Default::default(),
         }
     }
 
-    pub fn route<H: Handler + 'static>(mut self, handler: H) -> Self
+    pub fn route<H: Handler<O> + 'static>(mut self, handler: H) -> Self
     where
-        H: Handler,
+        O: IntoResponse,
+        H: Handler<O>,
     {
         let routing_key = handler.routing_key();
         if self.routes.contains_key(&routing_key) {
@@ -30,7 +34,7 @@ impl Router {
         self
     }
 
-    pub fn call(&self, req: &Request) {
+    pub fn call(&self, req: &Request) -> String {
         use ocpp::v16::boot_notification::BootNotification;
         let type_id = match &req.0 {
             Message::Call(call) => match &call.payload {
@@ -77,8 +81,8 @@ impl Router {
         };
 
         match self.routes.get(&type_id) {
-            Some(handler) => handler.call(req),
-            None => println!("No handler for: {:?}", req),
+            Some(handler) => handler.call(req).into_response(),
+            None => "Error".to_string(),
         }
     }
 }
