@@ -1,8 +1,9 @@
 use std::any::TypeId;
 use std::collections::HashMap;
 
-use crate::handler::{Handler, IntoResponse};
+use crate::handler::Handler;
 use crate::request::*;
+use crate::response::IntoResponse;
 use ocpp::call::Payload;
 use ocpp::call_error::CallError;
 use ocpp::call_result::CallResult;

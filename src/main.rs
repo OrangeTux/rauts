@@ -1,13 +1,15 @@
 mod handler;
 mod logger;
 mod request;
+mod response;
 mod router;
 
-use handler::{IntoHandler, IntoResponse};
+use handler::IntoHandler;
 use ocpp::call_result::{CallResult, Payload};
 use ocpp::v16::authorize::Authorize;
 use ocpp::v16::authorize_response::{AuthorizeResponse, IdTagInfo, Status};
 use request::{Call, Request, Source, CGW, TPBE};
+use response::IntoResponse;
 
 use router::Router;
 //use logger::Logger;
