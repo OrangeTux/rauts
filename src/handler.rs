@@ -1,3 +1,5 @@
+use ocpp::call_error::CallError;
+use ocpp::call_result::CallResult;
 use std::{any::TypeId, marker::PhantomData};
 
 use crate::request::{FromRequest, Request};
@@ -19,12 +21,25 @@ pub trait Handler {
 }
 
 pub trait IntoResponse {
-    fn into_response(&self) -> String;
+    fn into_response(&self) -> Result<CallResult, CallError>;
 }
 
-impl IntoResponse for () {
-    fn into_response(&self) -> String {
-        "()".to_string()
+impl IntoResponse for CallResult {
+    fn into_response(&self) -> Result<CallResult, CallError> {
+        Ok(self.clone())
+    }
+}
+
+use ocpp::call_result::Payload;
+use ocpp::v16::authorize_response::AuthorizeResponse;
+
+impl IntoResponse for AuthorizeResponse {
+    fn into_response(&self) -> Result<CallResult, CallError> {
+        Ok(CallResult {
+            message_type_id: 3,
+            unique_id: "123".to_string(),
+            payload: Payload::Authorize(self.clone()),
+        })
     }
 }
 

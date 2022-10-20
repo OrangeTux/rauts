@@ -4,6 +4,8 @@ use std::collections::HashMap;
 use crate::handler::{Handler, IntoResponse};
 use crate::request::*;
 use ocpp::call::Payload;
+use ocpp::call_error::CallError;
+use ocpp::call_result::CallResult;
 use ocpp::v16::authorize::Authorize;
 use ocpp::Message;
 
@@ -33,7 +35,7 @@ impl Router {
         self
     }
 
-    pub fn call(&self, req: &Request) -> String {
+    pub fn call(&self, req: &Request) -> Result<CallResult, CallError> {
         use ocpp::v16::boot_notification::BootNotification;
         let type_id = match &req.0 {
             Message::Call(call) => match &call.payload {
@@ -81,7 +83,12 @@ impl Router {
 
         match self.routes.get(&type_id) {
             Some(handler) => handler.call(req).into_response(),
-            None => "Error".to_string(),
+            None => Err(CallError::new(
+                "123".to_string(),
+                "InternalError".to_string(),
+                "".to_string(),
+                HashMap::default(),
+            )),
         }
     }
 }
