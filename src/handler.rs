@@ -31,19 +31,19 @@ macro_rules! factory_tuple_handler ({ $($param:ident)* } => {
     }
 });
 
-factory_tuple_handler! {}
+//factory_tuple_handler! {}
 factory_tuple_handler! { A }
-factory_tuple_handler! { A B }
-factory_tuple_handler! { A B C }
-factory_tuple_handler! { A B C D }
-factory_tuple_handler! { A B C D E }
-factory_tuple_handler! { A B C D E F }
-factory_tuple_handler! { A B C D E F G }
-factory_tuple_handler! { A B C D E F G H }
-factory_tuple_handler! { A B C D E F G H I }
-factory_tuple_handler! { A B C D E F G H I J }
-factory_tuple_handler! { A B C D E F G H I J K }
-factory_tuple_handler! { A B C D E F G H I J K L }
+//factory_tuple_handler! { A B }
+//factory_tuple_handler! { A B C }
+//factory_tuple_handler! { A B C D }
+//factory_tuple_handler! { A B C D E }
+//factory_tuple_handler! { A B C D E F }
+//factory_tuple_handler! { A B C D E F G }
+//factory_tuple_handler! { A B C D E F G H }
+//factory_tuple_handler! { A B C D E F G H I }
+//factory_tuple_handler! { A B C D E F G H I J }
+//factory_tuple_handler! { A B C D E F G H I J K }
+//factory_tuple_handler! { A B C D E F G H I J K L }
 
 macro_rules! factory_tuple ({ $($param:ident)* } => {
     impl<Func, $($param,)*> IntoHandler<Func, ($($param,)*)> for Func
@@ -64,16 +64,16 @@ macro_rules! factory_tuple ({ $($param:ident)* } => {
     }
 });
 
-factory_tuple! {}
+//factory_tuple! {}
 factory_tuple! { A }
-factory_tuple! { A B }
-factory_tuple! { A B C }
-factory_tuple! { A B C D }
-factory_tuple! { A B C D E }
-factory_tuple! { A B C D E F }
-factory_tuple! { A B C D E F G }
-factory_tuple! { A B C D E F G H }
-factory_tuple! { A B C D E F G H I }
-factory_tuple! { A B C D E F G H I J }
-factory_tuple! { A B C D E F G H I J K }
-factory_tuple! { A B C D E F G H I J K L }
+//factory_tuple! { A B }
+//factory_tuple! { A B C }
+//factory_tuple! { A B C D }
+//factory_tuple! { A B C D E }
+//factory_tuple! { A B C D E F }
+//factory_tuple! { A B C D E F G }
+//factory_tuple! { A B C D E F G H }
+//factory_tuple! { A B C D E F G H I }
+//factory_tuple! { A B C D E F G H I J }
+//factory_tuple! { A B C D E F G H I J K }
+//factory_tuple! { A B C D E F G H I J K L }
