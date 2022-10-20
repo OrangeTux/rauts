@@ -12,8 +12,9 @@ pub trait IntoHandler<F, Args, O> {
     fn into_handler(self: Self) -> ConcreteHandler<F, Args, O>;
 }
 
-pub trait Handler<O: IntoResponse> {
-    fn call(&self, args: &Request) -> O;
+pub trait Handler {
+    type Response;
+    fn call(&self, args: &Request) -> Self::Response;
     fn routing_key(&self) -> TypeId;
 }
 
@@ -27,14 +28,15 @@ impl IntoResponse for () {
     }
 }
 
-impl<Func, A: FromRequest + 'static, O> Handler<O> for ConcreteHandler<Func, (A,), O>
+impl<Func, A: FromRequest + 'static, O> Handler for ConcreteHandler<Func, (A,), O>
 where
-    O: IntoResponse,
+    O: IntoResponse + 'static,
     Func: Fn(A) -> O,
 {
+    type Response = Box<dyn IntoResponse>;
     #[allow(unused_variables)]
-    fn call(&self, request: &Request) -> O {
-        (self.func)(A::from_request(request))
+    fn call(&self, request: &Request) -> Self::Response {
+        Box::new((self.func)(A::from_request(request)))
     }
 
     fn routing_key(&self) -> TypeId {

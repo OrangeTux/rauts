@@ -16,8 +16,9 @@ impl IntoResponse for u8 {
     }
 }
 
-fn call_authorize_cgw(Call(Authorize { id_tag }, ..): Call<Authorize, CGW>) {
+fn call_authorize_cgw(Call(Authorize { id_tag }, ..): Call<Authorize, CGW>) -> u8 {
     println!("CGW: Authorize id_tag: {}", id_tag);
+    4
 }
 
 fn call_authorize_tpb(Call(authorize, ..): Call<Authorize, TPBE>) {
@@ -35,15 +36,15 @@ fn main() {
     let ocpp_message =
         ocpp::unpack(r#"[2, "424242", "Authorize",  {"idTag": "454564564"}]"#).unwrap();
     let request = Request(ocpp_message, Source::TPBE);
-    router.call(&request);
+    println!("Response {}", router.call(&request));
 
     let ocpp_message =
         ocpp::unpack(r#"[2, "6666666", "Authorize",  {"idTag": "1333333337"}]"#).unwrap();
     let request = Request(ocpp_message, Source::CGW);
-    router.call(&request);
+    println!("Response {}", router.call(&request));
 
     let ocpp_message =
         ocpp::unpack(r#"[2, "6666666", "BootNotification",  {"chargePointModel": "optimus prime", "chargePointVendor": ""}]"#).unwrap();
     let request = Request(ocpp_message, Source::Charger);
-    router.call(&request);
+    println!("Response {}", router.call(&request));
 }

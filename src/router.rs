@@ -7,24 +7,23 @@ use ocpp::call::Payload;
 use ocpp::v16::authorize::Authorize;
 use ocpp::Message;
 
-pub struct Router<O: IntoResponse> {
-    routes: HashMap<TypeId, Box<dyn Handler<O>>>,
+pub struct Router {
+    routes: HashMap<TypeId, Box<dyn Handler<Response = Box<dyn IntoResponse>>>>,
 }
 
-impl<O> Router<O>
-where
-    O: IntoResponse,
-{
+impl Router {
     pub fn new() -> Self {
         Self {
             routes: Default::default(),
         }
     }
 
-    pub fn route<H: Handler<O> + 'static>(mut self, handler: H) -> Self
+    pub fn route<H: Handler<Response = Box<dyn IntoResponse>> + 'static>(
+        mut self,
+        handler: H,
+    ) -> Self
     where
-        O: IntoResponse,
-        H: Handler<O>,
+        H: Handler,
     {
         let routing_key = handler.routing_key();
         if self.routes.contains_key(&routing_key) {
