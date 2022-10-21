@@ -9,7 +9,8 @@ impl<T> Handler for Logger<T>
 where
     T: Handler,
 {
-    fn call(&self, args: &Request) {
+    type Response = T::Response;
+    fn call(&self, args: &Request) -> Self::Response {
         let from = &args.1;
         info!(?from, "ocpp msg: {:?}", args.0);
         self.0.call(args)

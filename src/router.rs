@@ -3,12 +3,15 @@ use std::collections::HashMap;
 
 use crate::handler::Handler;
 use crate::request::*;
+use crate::response::IntoResponse;
 use ocpp::call::Payload;
+use ocpp::call_error::CallError;
+use ocpp::call_result::CallResult;
 use ocpp::v16::authorize::Authorize;
 use ocpp::Message;
 
 pub struct Router {
-    routes: HashMap<TypeId, Box<dyn Handler>>,
+    routes: HashMap<TypeId, Box<dyn Handler<Response = Box<dyn IntoResponse>>>>,
 }
 
 impl Router {
@@ -18,7 +21,10 @@ impl Router {
         }
     }
 
-    pub fn route<H: Handler + 'static>(mut self, handler: H) -> Self
+    pub fn register<H: Handler<Response = Box<dyn IntoResponse>> + 'static>(
+        mut self,
+        handler: H,
+    ) -> Self
     where
         H: Handler,
     {
@@ -30,7 +36,7 @@ impl Router {
         self
     }
 
-    pub fn call(&self, req: &Request) {
+    pub fn route(&self, req: &Request) -> Result<CallResult, CallError> {
         use ocpp::v16::boot_notification::BootNotification;
         let type_id = match &req.0 {
             Message::Call(call) => match &call.payload {
@@ -71,14 +77,21 @@ impl Router {
                 Payload::UnlockConnector(_) => todo!(),
                 Payload::UpdateFirmware(_) => todo!(),
             },
-            Message::CallResult(_) => todo!(),
-            Message::PartialCallResult(_) => todo!(),
-            Message::CallError(_) => todo!(),
+            _ => panic!("Server can only handle Calls yet"),
+        };
+        let call = match &req.0 {
+            Message::Call(call) => call,
+            _ => panic!("Server can only handle Calls yet"),
         };
 
         match self.routes.get(&type_id) {
-            Some(handler) => handler.call(req),
-            None => println!("No handler for: {:?}", req),
+            Some(handler) => handler.call(req).into_response(call),
+            None => Err(CallError::new(
+                "123".to_string(),
+                "InternalError".to_string(),
+                "".to_string(),
+                HashMap::default(),
+            )),
         }
     }
 }

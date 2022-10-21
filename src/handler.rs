@@ -1,30 +1,35 @@
+use crate::request::{FromRequest, Request};
+use crate::response::IntoResponse;
 use std::{any::TypeId, marker::PhantomData};
 
-use crate::request::{FromRequest, Request};
-
-pub struct ConcreteHandler<F, Args> {
+pub struct ConcreteHandler<F, Args, O> {
     func: F,
     args: PhantomData<Args>,
+    o: PhantomData<O>,
 }
 
-pub trait IntoHandler<F, Args> {
-    fn into_handler(self: Self) -> ConcreteHandler<F, Args>;
+pub trait IntoHandler<F, Args, O> {
+    fn into_handler(self: Self) -> ConcreteHandler<F, Args, O>;
 }
 
 pub trait Handler {
-    fn call(&self, args: &Request); // -> Self::Output;
+    type Response;
+    fn call(&self, args: &Request) -> Self::Response;
     fn routing_key(&self) -> TypeId;
 }
 
 macro_rules! factory_tuple_handler ({ $($param:ident)* } => {
-    impl<Func, $($param:FromRequest +'static,)*> Handler for ConcreteHandler<Func, ($($param,)*)>
+    impl<Func, O, $($param:FromRequest +'static,)*> Handler for ConcreteHandler<Func, ($($param,)*), O>
     where
-        Func: Fn($( $param, )*),
+        O: IntoResponse + 'static,
+        Func: Fn($( $param, )*) -> O,
     {
+        type Response = Box<dyn IntoResponse>;
         #[allow(unused_variables)]
-        fn call(&self, request: &Request) {
-            (self.func)($( $param::from_request(request), )*);
-        }
+            fn call(&self, request: &Request) -> Self::Response {
+                Box::new((self.func)($( $param::from_request(request), )*))
+            }
+
         fn routing_key(&self) -> TypeId {
             TypeId::of::<($( $param, )*)>()
         }
@@ -46,19 +51,21 @@ factory_tuple_handler! { A B C D E F G H I J K }
 factory_tuple_handler! { A B C D E F G H I J K L }
 
 macro_rules! factory_tuple ({ $($param:ident)* } => {
-    impl<Func, $($param,)*> IntoHandler<Func, ($($param,)*)> for Func
+    impl<Func, O, $($param,)*> IntoHandler<Func, ($($param,)*), O> for Func
     where
+        O: IntoResponse,
         $( $param: FromRequest, )*
-        Func: Fn($($param),*)
+        Func: Fn($($param),*) -> O
     {
         // type Output = Box<dyn Debug>;
 
         #[inline]
         #[allow(non_snake_case)]
-        fn into_handler(self: Func) -> ConcreteHandler<Func, ($($param,)*)> { // -> Self::Output {
+        fn into_handler(self: Func) -> ConcreteHandler<Func, ($($param,)*), O> { // -> Self::Output {
             ConcreteHandler {
                 func: self,
-                args: PhantomData
+                args: PhantomData,
+                o: PhantomData,
             }
         }
     }
