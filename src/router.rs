@@ -21,7 +21,7 @@ impl Router {
         }
     }
 
-    pub fn route<H: Handler<Response = Box<dyn IntoResponse>> + 'static>(
+    pub fn register<H: Handler<Response = Box<dyn IntoResponse>> + 'static>(
         mut self,
         handler: H,
     ) -> Self
@@ -36,7 +36,7 @@ impl Router {
         self
     }
 
-    pub fn call(&self, req: &Request) -> Result<CallResult, CallError> {
+    pub fn route(&self, req: &Request) -> Result<CallResult, CallError> {
         use ocpp::v16::boot_notification::BootNotification;
         let type_id = match &req.0 {
             Message::Call(call) => match &call.payload {
@@ -77,13 +77,15 @@ impl Router {
                 Payload::UnlockConnector(_) => todo!(),
                 Payload::UpdateFirmware(_) => todo!(),
             },
-            Message::CallResult(_) => todo!(),
-            Message::PartialCallResult(_) => todo!(),
-            Message::CallError(_) => todo!(),
+            _ => panic!("Server can only handle Calls yet"),
+        };
+        let call = match &req.0 {
+            Message::Call(call) => call,
+            _ => panic!("Server can only handle Calls yet"),
         };
 
         match self.routes.get(&type_id) {
-            Some(handler) => handler.call(req).into_response(),
+            Some(handler) => handler.call(req).into_response(call),
             None => Err(CallError::new(
                 "123".to_string(),
                 "InternalError".to_string(),

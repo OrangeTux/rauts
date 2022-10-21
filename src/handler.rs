@@ -1,5 +1,5 @@
 use crate::request::{FromRequest, Request};
-use crate::response::*;
+use crate::response::IntoResponse;
 use std::{any::TypeId, marker::PhantomData};
 
 pub struct ConcreteHandler<F, Args, O> {
