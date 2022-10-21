@@ -11,9 +11,11 @@ where
 {
     type Response = T::Response;
     fn call(&self, args: &Request) -> Self::Response {
-        let from = &args.1;
-        info!(?from, "ocpp msg: {:?}", args.0);
-        self.0.call(args)
+        let from = &args.charger_id;
+        info!(?from, "ocpp msg: {:?}", args.call);
+        let response = self.0.call(args);
+
+        response
     }
 
     fn routing_key(&self) -> TypeId {

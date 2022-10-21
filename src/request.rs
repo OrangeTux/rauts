@@ -1,58 +1,32 @@
 use ocpp::call::Payload;
 use ocpp::v16::authorize::Authorize;
-use ocpp::Message;
 
 #[derive(Debug, Clone)]
-pub struct TPBE;
-#[derive(Debug, Clone)]
-pub struct CGW;
-#[derive(Debug, Clone)]
-pub struct Charger;
+pub struct ChargerId(pub String);
 
-#[derive(Debug, Clone)]
-pub enum Source {
-    TPBE,
-    CGW,
-    Charger,
-}
-
-impl FromRequest for Source {
+impl FromRequest for ChargerId {
     fn from_request(req: &Request) -> Self {
-        req.1.clone()
-    }
-}
-
-pub struct Call<T, S>(pub T, pub S);
-
-impl FromRequest for Call<Authorize, TPBE> {
-    fn from_request(req: &Request) -> Self {
-        match &req.0 {
-            Message::Call(call) => match &call.payload {
-                Payload::Authorize(authorize) => Call(authorize.clone(), TPBE),
-                _ => panic!("Must be type"),
-            },
-            _ => panic!("Must be a call!"),
-        }
-    }
-}
-
-impl FromRequest for Call<Authorize, CGW> {
-    fn from_request(req: &Request) -> Self {
-        match &req.0 {
-            Message::Call(call) => match &call.payload {
-                Payload::Authorize(authorize) => Call(authorize.clone(), CGW),
-                _ => panic!("This route shouldn't be possible"),
-            },
-            _ => panic!("This route shouldn't be possible"),
-        }
+        req.charger_id.clone()
     }
 }
 
 #[derive(Debug)]
-pub struct Request(pub ocpp::Message, pub Source);
+pub struct Request {
+    pub call: ocpp::call::Call,
+    pub charger_id: ChargerId,
+}
 
 pub trait FromRequest {
     fn from_request(req: &Request) -> Self;
+}
+
+impl FromRequest for Authorize {
+    fn from_request(req: &Request) -> Self {
+        match &req.call.payload {
+            Payload::Authorize(payload) => payload.clone(),
+            _ => panic!("yolo")
+        }
+    }
 }
 
 macro_rules! factory_tuple ({ $($param:ident)* } => {
