@@ -1,3 +1,5 @@
+use super::UniqueId;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct AuthorizeResponse {
     pub id_tag_info: IdTagInfo,
@@ -22,7 +24,7 @@ pub enum Status {
 #[derive(Clone, Debug, PartialEq)]
 pub struct CallResult {
     pub message_type_id: u8,
-    pub unique_id: String,
+    pub unique_id: UniqueId,
     pub payload: Payload,
 }
 

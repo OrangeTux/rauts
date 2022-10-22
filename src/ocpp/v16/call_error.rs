@@ -1,9 +1,10 @@
+use super::UniqueId;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallError {
     pub message_type_id: u8,
-    pub unique_id: String,
+    pub unique_id: UniqueId,
     pub error_code: String,
     pub error_description: String,
     pub error_details: HashMap<String, String>,
@@ -11,7 +12,7 @@ pub struct CallError {
 
 impl CallError {
     pub fn new(
-        unique_id: String,
+        unique_id: UniqueId,
         error_code: String,
         error_description: String,
         error_details: HashMap<String, String>,

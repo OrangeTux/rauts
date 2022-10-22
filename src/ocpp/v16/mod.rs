@@ -1,6 +1,7 @@
 pub mod call;
 pub mod call_error;
 pub mod call_result;
+use uuid::Uuid;
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Action {
@@ -67,5 +68,23 @@ impl TryFrom<&String> for Action {
         };
 
         Ok(variant)
+    }
+}
+
+/// `UniqueId` models the unique id present in every OCPP message.
+#[derive(Clone, Debug, PartialEq)]
+pub struct UniqueId(String);
+
+impl UniqueId {
+    /// Generate a new `UniqueId`.
+    fn generate() -> Self {
+        Self(Uuid::new_v4().to_string())
+    }
+}
+
+impl Default for UniqueId {
+    /// Generate a new `UniqueId`.
+    fn default() -> Self {
+        Self::generate()
     }
 }

@@ -26,7 +26,7 @@ impl FromRequest for Authorize {
     fn from_request(req: &Request) -> Self {
         match &req.call.payload {
             Payload::Authorize(payload) => payload.clone(),
-            _ => panic!("yolo"),
+            _ => todo!("We probably want to use TryFromRequest instead of FromRequest."),
         }
     }
 }

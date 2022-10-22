@@ -2,7 +2,7 @@ use rauts::extract::{ChargerId, Request};
 use rauts::handler::IntoHandler;
 use rauts::middleware::Logger;
 use rauts::ocpp::v16::{
-    call::{Authorize, Call, Payload},
+    call::{Authorize, Call},
     call_result::{AuthorizeResponse, IdTagInfo, Status},
     Action,
 };
@@ -30,14 +30,13 @@ fn main() {
     let router: Router<Action> =
         Router::new().register(Logger(authorize.into_handler()), Action::Authorize);
 
+    let call: Call = Authorize {
+        id_tag: "454564564".to_string(),
+    }
+    .into();
+
     let request = Request {
-        call: Call::new(
-            "424242".to_string(),
-            Action::Authorize,
-            Payload::Authorize(Authorize {
-                id_tag: "454564564".to_string(),
-            }),
-        ),
+        call,
         charger_id: ChargerId("Alfen 123".to_string()),
     };
 
