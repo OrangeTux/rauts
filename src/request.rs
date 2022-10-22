@@ -1,5 +1,7 @@
-use ocpp::call::Payload;
-use ocpp::v16::authorize::Authorize;
+use crate::ocpp::v16::{
+    call::{Authorize, Call, Payload},
+    Action,
+};
 
 #[derive(Debug, Clone)]
 pub struct ChargerId(pub String);
@@ -12,7 +14,7 @@ impl FromRequest for ChargerId {
 
 #[derive(Debug)]
 pub struct Request {
-    pub call: ocpp::call::Call,
+    pub call: Call,
     pub charger_id: ChargerId,
 }
 
@@ -24,8 +26,14 @@ impl FromRequest for Authorize {
     fn from_request(req: &Request) -> Self {
         match &req.call.payload {
             Payload::Authorize(payload) => payload.clone(),
-            _ => panic!("yolo")
+            _ => panic!("yolo"),
         }
+    }
+}
+
+impl FromRequest for Action {
+    fn from_request(req: &Request) -> Self {
+        req.call.action.clone()
     }
 }
 

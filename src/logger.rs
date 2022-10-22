@@ -1,8 +1,6 @@
-use std::any::TypeId;
-
-use tracing::info;
-
 use crate::{handler::Handler, request::Request};
+use std::any::TypeId;
+use tracing::info;
 
 pub struct Logger<T: Handler>(pub T);
 impl<T> Handler for Logger<T>

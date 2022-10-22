@@ -1,9 +1,8 @@
-use ocpp::call::Call;
-use ocpp::call_error::CallError;
-use ocpp::call_result::CallResult;
-
-use ocpp::call_result::Payload;
-use ocpp::v16::authorize_response::AuthorizeResponse;
+use crate::ocpp::v16::{
+    call::Call,
+    call_error::CallError,
+    call_result::{AuthorizeResponse, CallResult, Payload},
+};
 
 /// Trait for generating a response to an OCPP Call.
 ///
