@@ -1,4 +1,4 @@
-use crate::request::{FromRequest, Request};
+use crate::extract::{FromRequest, Request};
 use crate::response::IntoResponse;
 use std::{any::TypeId, marker::PhantomData};
 

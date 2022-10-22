@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
+use crate::extract::{FromRequest, Request};
 use crate::handler::Handler;
 use crate::ocpp::v16::{call_error::CallError, call_result::CallResult};
-use crate::request::{FromRequest, Request};
 use crate::response::IntoResponse;
 
 pub struct Router<T> {

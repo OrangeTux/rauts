@@ -1,20 +1,12 @@
-mod handler;
-mod logger;
-mod ocpp;
-mod request;
-mod response;
-mod router;
-
-use handler::IntoHandler;
-use ocpp::v16::{
+use rauts::extract::{ChargerId, Request};
+use rauts::handler::IntoHandler;
+use rauts::middleware::Logger;
+use rauts::ocpp::v16::{
     call::{Authorize, Call, Payload},
     call_result::{AuthorizeResponse, IdTagInfo, Status},
     Action,
 };
-use request::{ChargerId, Request};
-
-use logger::Logger;
-use router::Router;
+use rauts::Router;
 
 fn authorize(
     Authorize { id_tag }: Authorize,

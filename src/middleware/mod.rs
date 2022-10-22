@@ -1,8 +1,9 @@
-use crate::{handler::Handler, request::Request};
+use crate::{extract::Request, handler::Handler};
 use std::any::TypeId;
 use tracing::info;
 
 pub struct Logger<T: Handler>(pub T);
+
 impl<T> Handler for Logger<T>
 where
     T: Handler,
@@ -11,9 +12,7 @@ where
     fn call(&self, args: &Request) -> Self::Response {
         let from = &args.charger_id;
         info!(?from, "ocpp msg: {:?}", args.call);
-        let response = self.0.call(args);
-
-        response
+        self.0.call(args)
     }
 
     fn routing_key(&self) -> TypeId {
