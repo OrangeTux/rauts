@@ -12,10 +12,16 @@ impl FromRequest for ChargerId {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Request {
     pub call: Call,
     pub charger_id: ChargerId,
+}
+
+impl FromRequest for Request {
+    fn from_request(req: &Request) -> Self {
+        req.clone()
+    }
 }
 
 pub trait FromRequest {

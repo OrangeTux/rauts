@@ -1,16 +1,17 @@
 use rauts::extract::{ChargerId, Request};
 use rauts::handler::IntoHandler;
-use rauts::middleware::Logger;
 use rauts::ocpp::v16::{
-    call::{Authorize, Call, Heartbeat},
+    call::{Authorize, Call},
     call_result,
     call_result::{IdTagInfo, Status},
     Action,
 };
 use rauts::Router;
 
-use chrono::prelude::*;
-
+/// A handler function must have zero or more arguments. Each argument must implement
+/// `rauts::extract::FromRequest`.
+///
+/// This handler functions has two arguments, both implementing `rauts::extract::FromRequest`.
 fn authorize(
     Authorize { id_tag }: Authorize,
     ChargerId(charger_id): ChargerId,
@@ -28,17 +29,9 @@ fn authorize(
     }
 }
 
-fn heartbeat() -> call_result::Heartbeat {
-    call_result::Heartbeat {
-        current_time: Utc::now(),
-    }
-}
-
 fn main() {
-    tracing_subscriber::fmt::init();
-    let router: Router<Action> = Router::new()
-        .register(Logger(authorize.into_handler()), Action::Authorize)
-        .register(Logger(heartbeat.into_handler()), Action::Heartbeat);
+    let router: Router<Action> =
+        Router::new().register(authorize.into_handler(), Action::Authorize);
 
     let call: Call = Authorize {
         id_tag: "454564564".to_string(),
@@ -50,13 +43,5 @@ fn main() {
         charger_id: ChargerId("Alfen 123".to_string()),
     };
 
-    dbg!(router.route(&request));
-
-    let call: Call = Heartbeat {}.into();
-    let request = Request {
-        call,
-        charger_id: ChargerId("Alfen 123".to_string()),
-    };
-
-    dbg!(router.route(&request));
+    dbg!(router.route(&request).unwrap());
 }
