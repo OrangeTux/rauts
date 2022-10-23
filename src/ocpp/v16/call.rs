@@ -30,12 +30,27 @@ impl From<Authorize> for Call {
     }
 }
 
+impl From<Heartbeat> for Call {
+    fn from(payload: Heartbeat) -> Self {
+        Call {
+            message_type_id: 2,
+            unique_id: UniqueId::default(),
+            action: Action::Heartbeat,
+            payload: Payload::Heartbeat(payload),
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Payload {
     Authorize(Authorize),
+    Heartbeat(Heartbeat),
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Authorize {
     pub id_tag: String,
 }
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Heartbeat {}

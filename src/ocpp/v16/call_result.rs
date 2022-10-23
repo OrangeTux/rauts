@@ -1,9 +1,5 @@
 use super::UniqueId;
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct AuthorizeResponse {
-    pub id_tag_info: IdTagInfo,
-}
+use chrono::prelude::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct IdTagInfo {
@@ -30,5 +26,19 @@ pub struct CallResult {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Payload {
-    Authorize(AuthorizeResponse),
+    Authorize(Authorize),
+    Heartbeat(Heartbeat),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Authorize {
+    pub id_tag_info: IdTagInfo,
+}
+
+/// Payload of Heartbeat response.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct Heartbeat {
+    /// The current time of the Central System. The charger should adjust it's clock to this
+    /// timestamp.
+    pub current_time: DateTime<Utc>,
 }
