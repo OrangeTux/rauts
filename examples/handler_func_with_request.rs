@@ -1,7 +1,8 @@
+use rauts::extract::FromRequest;
 use rauts::extract::{ChargerId, Request};
 use rauts::handler::IntoHandler;
 use rauts::ocpp::v16::{
-    call::{Authorize, Call, Payload},
+    call::{Authorize, Call},
     call_result,
     call_result::{IdTagInfo, Status},
     Action,
@@ -13,15 +14,13 @@ use rauts::Router;
 ///
 /// This handler functions has one argument of type `Request`.
 fn authorize(request: Request) -> call_result::Authorize {
-    let status = match request.call.payload {
-        Payload::Authorize(payload) => {
-            if payload.id_tag.as_str() == "454564564" {
-                Status::Accepted
-            } else {
-                Status::Invalid
-            }
+    let payload = Authorize::from_request(&request);
+    let status = {
+        if let status = payload.id_tag.as_str() == "454564564" {
+            Status::Accepted
+        } else {
+            Status::Invalid
         }
-        _ => Status::Invalid,
     };
     call_result::Authorize {
         id_tag_info: IdTagInfo {

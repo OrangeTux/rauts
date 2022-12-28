@@ -1,7 +1,7 @@
 use crate::ocpp::v16::{
     call::Call,
     call_error::CallError,
-    call_result::{Authorize, CallResult, Heartbeat, Payload},
+    call_result::{Authorize, CallResult, Heartbeat},
 };
 
 /// Trait for generating a response to an OCPP Call.
@@ -31,7 +31,7 @@ impl IntoResponse for Authorize {
         Ok(CallResult {
             message_type_id: 3,
             unique_id: call.unique_id.clone(),
-            payload: Payload::Authorize(self.clone()),
+            payload: serde_json::to_value(self).unwrap(),
         })
     }
 }
@@ -41,7 +41,7 @@ impl IntoResponse for Heartbeat {
         Ok(CallResult {
             message_type_id: 3,
             unique_id: call.unique_id.clone(),
-            payload: Payload::Heartbeat(self.clone()),
+            payload: serde_json::to_value(self).unwrap(),
         })
     }
 }

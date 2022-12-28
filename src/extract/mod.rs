@@ -1,5 +1,5 @@
 use crate::ocpp::v16::{
-    call::{Authorize, Call, Payload},
+    call::{Authorize, Call},
     Action,
 };
 
@@ -30,10 +30,12 @@ pub trait FromRequest {
 
 impl FromRequest for Authorize {
     fn from_request(req: &Request) -> Self {
-        match &req.call.payload {
-            Payload::Authorize(payload) => payload.clone(),
-            _ => todo!("We probably want to use TryFromRequest instead of FromRequest."),
-        }
+        let payload: Self = serde_json::from_value(req.call.payload.clone()).unwrap();
+        payload
+        //match &req.call.payload {
+        //Payload::Authorize(payload) => payload.clone(),
+        //_ => todo!("We probably want to use TryFromRequest instead of FromRequest."),
+        //}
     }
 }
 
