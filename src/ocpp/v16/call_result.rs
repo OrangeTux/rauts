@@ -1,5 +1,6 @@
 use super::UniqueId;
 use chrono::prelude::*;
+use serde::ser::{SerializeSeq, Serializer};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -23,6 +24,20 @@ pub struct CallResult {
     pub message_type_id: u8,
     pub unique_id: UniqueId,
     pub payload: serde_json::Value,
+}
+
+impl Serialize for CallResult {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(3))?;
+        seq.serialize_element(&self.message_type_id);
+        seq.serialize_element(&Into::<String>::into(self.unique_id.clone()));
+        seq.serialize_element(&self.payload);
+
+        seq.end()
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

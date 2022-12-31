@@ -32,6 +32,39 @@ pub enum Action {
     UpdateFirmware,
 }
 
+impl From<Action> for String {
+    fn from(val: Action) -> Self {
+        match val {
+            Action::Authorize => "Authorize",
+            Action::BootNotification => "BootNotification",
+            Action::CancelReservation => "CancelReservation",
+            Action::ChangeAvailability => "ChangeAvailability",
+            Action::ChangeConfiguration => "ChangeConfiguration",
+            Action::ClearCache => "ClearCache",
+            Action::DataTransfer => "DataTransfer",
+            Action::DiagnosticsStatusNotification => "DiagnosticsStatusNotification",
+            Action::GetCompositeSchedule => "GetCompositeSchedule",
+            Action::GetDiagnostics => "GetDiagnostics",
+            Action::GetLocalListVersion => "GetLocalListVersion",
+            Action::FirmwareStatusNotification => "FirmwareStatusNotification",
+            Action::Heartbeat => "Heartbeat",
+            Action::MeterValues => "MeterValues",
+            Action::RemoteStartTransaction => "RemoteStartTransaction",
+            Action::RemoteStopTransaction => "RemoteStopTransaction",
+            Action::ReserveNow => "ReserveNow",
+            Action::Reset => "Reset",
+            Action::SendLocalList => "SendLocalList",
+            Action::SetChargingProfile => "SetChargingProfile",
+            Action::StartTransaction => "StartTransaction",
+            Action::StopTransaction => "StopTransaction",
+            Action::TriggerMessage => "TriggerMessage",
+            Action::UnlockConnector => "UnlockConnector",
+            Action::UpdateFirmware => "UpdateFirmware",
+        }
+        .to_string()
+    }
+}
+
 impl TryFrom<&String> for Action {
     type Error = String;
 
@@ -74,6 +107,12 @@ impl TryFrom<&String> for Action {
 /// `UniqueId` models the unique id present in every OCPP message.
 #[derive(Clone, Debug, PartialEq)]
 pub struct UniqueId(String);
+
+impl From<UniqueId> for String {
+    fn from(value: UniqueId) -> Self {
+        value.0
+    }
+}
 
 impl UniqueId {
     /// Generate a new `UniqueId`.

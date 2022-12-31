@@ -32,14 +32,10 @@ impl FromRequest for Authorize {
     fn from_request(req: &Request) -> Self {
         let payload: Self = serde_json::from_value(req.call.payload.clone()).unwrap();
         payload
-        //match &req.call.payload {
-        //Payload::Authorize(payload) => payload.clone(),
-        //_ => todo!("We probably want to use TryFromRequest instead of FromRequest."),
-        //}
     }
 }
 
-impl FromRequest for Action {
+impl FromRequest for String {
     fn from_request(req: &Request) -> Self {
         req.call.action.clone()
     }
